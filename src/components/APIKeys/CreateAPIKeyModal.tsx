@@ -1,81 +1,62 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
-import { useAPIKeyStore } from '../../stores/apiKeyStore';
-import { useToast } from '@/hooks/use-toast';
+import { useAPIKeyStore } from '@/stores/apiKeyStore';
 
 export function CreateAPIKeyModal() {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    clientId: '',
     clientName: '',
     clientEmail: '',
-    maxInstallations: '',
-    expiresAt: ''
+    maxInstallations: 10,
+    expiresAt: '',
   });
 
-  const { clients, addAPIKey } = useAPIKeyStore();
-  const { toast } = useToast();
+  const addAPIKey = useAPIKeyStore((state) => state.addAPIKey);
+  const clients = useAPIKeyStore((state) => state.clients);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.clientName || !formData.clientEmail || !formData.maxInstallations) {
-      toast({
-        title: "Erro",
-        description: "Preencha todos os campos obrigatórios",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Find or create client
+    let client = clients.find(c => c.email === formData.clientEmail);
+    const clientId = client?.id || Math.random().toString(36).substr(2, 9);
 
     addAPIKey({
-      clientId: formData.clientId || Math.random().toString(36).substr(2, 9),
+      key: '', // This will be generated in the store
+      clientId,
       clientName: formData.clientName,
       clientEmail: formData.clientEmail,
-      maxInstallations: parseInt(formData.maxInstallations),
+      maxInstallations: formData.maxInstallations,
       currentInstallations: 0,
       isActive: true,
-      expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null
-    });
-
-    toast({
-      title: "Sucesso",
-      description: "Nova chave API criada com sucesso",
+      expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
     });
 
     setOpen(false);
     setFormData({
-      clientId: '',
       clientName: '',
       clientEmail: '',
-      maxInstallations: '',
-      expiresAt: ''
+      maxInstallations: 10,
+      expiresAt: '',
     });
-  };
-
-  const handleClientSelect = (clientId: string) => {
-    const client = clients.find(c => c.id === clientId);
-    if (client) {
-      setFormData({
-        ...formData,
-        clientId,
-        clientName: client.name,
-        clientEmail: client.email
-      });
-    }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
           Nova Chave API
         </Button>
       </DialogTrigger>
@@ -84,76 +65,48 @@ export function CreateAPIKeyModal() {
           <DialogTitle>Criar Nova Chave API</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="client">Cliente Existente (Opcional)</Label>
-            <Select onValueChange={handleClientSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecionar cliente existente" />
-              </SelectTrigger>
-              <SelectContent>
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.name} ({client.email})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="clientName">Nome do Cliente *</Label>
+          <div>
+            <Label htmlFor="clientName">Nome do Cliente</Label>
             <Input
               id="clientName"
               value={formData.clientName}
-              onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-              placeholder="Ex: TechCorp Ltd"
+              onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
               required
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="clientEmail">Email do Cliente *</Label>
+          <div>
+            <Label htmlFor="clientEmail">Email do Cliente</Label>
             <Input
               id="clientEmail"
               type="email"
               value={formData.clientEmail}
-              onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-              placeholder="admin@techcorp.com"
+              onChange={(e) => setFormData(prev => ({ ...prev, clientEmail: e.target.value }))}
               required
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="maxInstallations">Limite de Instalações *</Label>
+          <div>
+            <Label htmlFor="maxInstallations">Limite de Instalações</Label>
             <Input
               id="maxInstallations"
               type="number"
-              value={formData.maxInstallations}
-              onChange={(e) => setFormData({ ...formData, maxInstallations: e.target.value })}
-              placeholder="50"
               min="1"
+              value={formData.maxInstallations}
+              onChange={(e) => setFormData(prev => ({ ...prev, maxInstallations: parseInt(e.target.value) }))}
               required
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="expiresAt">Data de Expiração (Opcional)</Label>
+          <div>
+            <Label htmlFor="expiresAt">Data de Expiração (opcional)</Label>
             <Input
               id="expiresAt"
               type="date"
               value={formData.expiresAt}
-              onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, expiresAt: e.target.value }))}
             />
           </div>
-
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit">
-              Criar Chave API
-            </Button>
-          </div>
+          <Button type="submit" className="w-full">
+            Criar Chave API
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

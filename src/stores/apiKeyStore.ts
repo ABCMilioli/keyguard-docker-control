@@ -1,33 +1,27 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { APIKey, Client, Installation, DashboardMetrics, InstallationsByDay } from '../types';
-
-interface APIKeyStore {
-  // Data
-  apiKeys: APIKey[];
-  clients: Client[];
-  installations: Installation[];
-  
-  // Actions
-  addAPIKey: (apiKey: Omit<APIKey, 'id' | 'createdAt' | 'lastUsed'>) => void;
-  updateAPIKey: (id: string, updates: Partial<APIKey>) => void;
-  revokeAPIKey: (id: string) => void;
-  addClient: (client: Omit<Client, 'id' | 'createdAt'>) => void;
-  updateClient: (id: string, updates: Partial<Client>) => void;
-  addInstallation: (installation: Omit<Installation, 'id' | 'timestamp'>) => void;
-  
-  // Computed
-  getDashboardMetrics: () => DashboardMetrics;
-  getInstallationsByDay: () => InstallationsByDay[];
-  validateAPIKey: (key: string, ipAddress: string) => { success: boolean; message: string; installationsLeft?: number };
-}
+import { APIKey, Client, Installation, DashboardMetrics, InstallationsByDay, ValidationResponse } from '@/types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const generateAPIKey = () => 'ak_' + Array.from({ length: 28 }, () => 
   Math.random().toString(36).charAt(0)
 ).join('');
+
+interface APIKeyStore {
+  apiKeys: APIKey[];
+  clients: Client[];
+  installations: Installation[];
+  addAPIKey: (apiKeyData: Omit<APIKey, 'id' | 'createdAt' | 'lastUsed' | 'key'>) => void;
+  updateAPIKey: (id: string, updates: Partial<APIKey>) => void;
+  revokeAPIKey: (id: string) => void;
+  addClient: (clientData: Omit<Client, 'id' | 'createdAt'>) => void;
+  updateClient: (id: string, updates: Partial<Client>) => void;
+  addInstallation: (installationData: Omit<Installation, 'id' | 'timestamp'>) => void;
+  getDashboardMetrics: () => DashboardMetrics;
+  getInstallationsByDay: () => InstallationsByDay[];
+  validateAPIKey: (key: string, ipAddress?: string) => ValidationResponse;
+}
 
 export const useAPIKeyStore = create<APIKeyStore>()(
   persist(
@@ -178,13 +172,13 @@ export const useAPIKeyStore = create<APIKeyStore>()(
       }),
 
       updateAPIKey: (id, updates) => set((state) => ({
-        apiKeys: state.apiKeys.map(key => 
+        apiKeys: state.apiKeys.map((key) => 
           key.id === id ? { ...key, ...updates } : key
         )
       })),
 
       revokeAPIKey: (id) => set((state) => ({
-        apiKeys: state.apiKeys.map(key => 
+        apiKeys: state.apiKeys.map((key) => 
           key.id === id ? { ...key, isActive: false } : key
         )
       })),
@@ -199,7 +193,7 @@ export const useAPIKeyStore = create<APIKeyStore>()(
       }),
 
       updateClient: (id, updates) => set((state) => ({
-        clients: state.clients.map(client => 
+        clients: state.clients.map((client) => 
           client.id === id ? { ...client, ...updates } : client
         )
       })),
@@ -244,7 +238,7 @@ export const useAPIKeyStore = create<APIKeyStore>()(
         }));
       },
 
-      validateAPIKey: (key: string, ipAddress: string) => {
+      validateAPIKey: (key, ipAddress) => {
         const state = get();
         const apiKey = state.apiKeys.find(k => k.key === key);
         

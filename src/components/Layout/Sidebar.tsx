@@ -9,7 +9,8 @@ import {
   Settings,
   Shield,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Book
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'API Keys', href: '/api-keys', icon: Key },
   { name: 'Clientes', href: '/clients', icon: Users },
   { name: 'Instalações', href: '/installations', icon: Activity },
+  { name: 'Documentação', href: '/documentation', icon: Book },
   { name: 'Configurações', href: '/settings', icon: Settings },
 ];
 
