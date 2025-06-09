@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { AppLayout } from '../components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Users, Building, Mail, Phone, Plus } from 'lucide-react';
+import { Users, Building, Mail, Phone } from 'lucide-react';
 import { useAPIKeyStore } from '../stores/apiKeyStore';
+import { CreateClientModal } from '../components/Clients/CreateClientModal';
 
 export default function Clients() {
   const { clients, apiKeys } = useAPIKeyStore();
@@ -45,10 +44,7 @@ export default function Clients() {
               {clients.filter(c => c.status === 'active').length} ativos, {clients.filter(c => c.status === 'suspended').length} suspensos
             </span>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Cliente
-          </Button>
+          <CreateClientModal />
         </div>
 
         {/* Clients Grid */}
@@ -122,10 +118,7 @@ export default function Clients() {
             <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum cliente</h3>
             <p className="mt-1 text-sm text-gray-500">Comece criando um novo cliente.</p>
             <div className="mt-6">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Novo Cliente
-              </Button>
+              <CreateClientModal />
             </div>
           </div>
         )}

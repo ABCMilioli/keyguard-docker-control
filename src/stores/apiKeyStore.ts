@@ -15,7 +15,7 @@ interface APIKeyStore {
   addAPIKey: (apiKeyData: Omit<APIKey, 'id' | 'createdAt' | 'lastUsed' | 'key'>) => void;
   updateAPIKey: (id: string, updates: Partial<APIKey>) => void;
   revokeAPIKey: (id: string) => void;
-  addClient: (clientData: Omit<Client, 'id' | 'createdAt'>) => void;
+  addClient: (client: Client) => void;
   updateClient: (id: string, updates: Partial<Client>) => void;
   addInstallation: (installationData: Omit<Installation, 'id' | 'timestamp'>) => void;
   getDashboardMetrics: () => DashboardMetrics;
@@ -183,14 +183,9 @@ export const useAPIKeyStore = create<APIKeyStore>()(
         )
       })),
 
-      addClient: (clientData) => set((state) => {
-        const newClient: Client = {
-          ...clientData,
-          id: generateId(),
-          createdAt: new Date()
-        };
-        return { clients: [...state.clients, newClient] };
-      }),
+      addClient: (client) => set((state) => ({ 
+        clients: [...state.clients, client] 
+      })),
 
       updateClient: (id, updates) => set((state) => ({
         clients: state.clients.map((client) => 
