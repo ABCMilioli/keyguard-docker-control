@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Building, Mail, Phone } from 'lucide-react';
 import { useAPIKeyStore } from '../stores/apiKeyStore';
 import { CreateClientModal } from '../components/Clients/CreateClientModal';
+import { EditClientModal } from '../components/Clients/EditClientModal';
 
 export default function Clients() {
   const { clients, apiKeys } = useAPIKeyStore();
@@ -56,8 +57,11 @@ export default function Clients() {
               <Card key={client.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{client.name}</CardTitle>
-                    {getStatusBadge(client.status)}
+                    <div className="flex items-center space-x-2">
+                      <CardTitle className="text-lg">{client.name}</CardTitle>
+                      {getStatusBadge(client.status)}
+                    </div>
+                    <EditClientModal client={client} />
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">

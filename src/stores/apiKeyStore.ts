@@ -188,7 +188,7 @@ export const useAPIKeyStore = create<APIKeyStore>()(
       })),
 
       updateClient: (id, updates) => set((state) => ({
-        clients: state.clients.map((client) => 
+        clients: state.clients.map(client =>
           client.id === id ? { ...client, ...updates } : client
         )
       })),
