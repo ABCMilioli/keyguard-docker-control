@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ import { useUser } from '@/hooks/useUser';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { adminExists, isLoading: checkingAdmin } = useAdminStatus();
   const { setUser, user } = useUser();
@@ -21,12 +22,13 @@ export default function Login() {
     senha: ''
   });
 
-  // Se já estiver logado, redireciona para o dashboard
+  // Se já estiver logado, redireciona para o dashboard ou página original
   useEffect(() => {
     if (user) {
-      navigate('/');
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]);
 
   // Se não existe admin, redireciona para a página de registro
   useEffect(() => {
@@ -63,7 +65,10 @@ export default function Login() {
         title: 'Sucesso!',
         description: 'Login realizado com sucesso.',
       });
-      navigate('/');
+
+      // Redireciona para a página original ou dashboard
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
 
     } catch (error) {
       toast({
