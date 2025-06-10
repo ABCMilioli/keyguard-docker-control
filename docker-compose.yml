@@ -24,8 +24,13 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:131489152850082175195580@postgres:5432/keyguard
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  
 networks:
   network_public:
     external: true
