@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { API_URLS } from '@/config/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,23 +20,40 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simular autenticação
-    setTimeout(() => {
-      if (email === 'admin@apicontrol.com' && password === 'admin123') {
-        toast({
-          title: 'Login realizado com sucesso!',
-          description: 'Bem-vindo ao Docker API Control.',
-        });
-        navigate('/');
-      } else {
-        toast({
-          title: 'Erro no login',
-          description: 'Email ou senha incorretos.',
-          variant: 'destructive',
-        });
+    try {
+      const response = await fetch(API_URLS.login, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          senha: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao fazer login');
       }
+
+      toast({
+        title: 'Login realizado com sucesso!',
+        description: 'Bem-vindo ao Docker API Control.',
+      });
+      
+      // TODO: Salvar token e dados do usuário
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: 'Erro no login',
+        description: error instanceof Error ? error.message : 'Email ou senha incorretos.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

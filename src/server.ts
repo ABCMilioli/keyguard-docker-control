@@ -5,6 +5,7 @@ import { validarChaveAPI } from './api/middlewares/auth.js';
 import { APIController } from './api/controllers/apiController.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { userController } from './controllers/userController.js';
 
 // Carrega variáveis de ambiente
 dotenv.config();
@@ -23,10 +24,19 @@ app.use(express.json());
 // Rotas da API
 const apiRouter = express.Router();
 
-// Middleware de autenticação para todas as rotas da API
+// Rotas públicas (sem autenticação)
+apiRouter.post('/users/register', (req: Request, res: Response) => {
+  userController.register(req, res);
+});
+
+apiRouter.post('/users/login', (req: Request, res: Response) => {
+  userController.login(req, res);
+});
+
+// Middleware de autenticação para todas as rotas protegidas
 apiRouter.use(validarChaveAPI);
 
-// Endpoints
+// Endpoints protegidos
 apiRouter.post('/validar', (req: Request, res: Response) => {
   apiController.validarERegistrar(req, res);
 });

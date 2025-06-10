@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  api:
+  keyguard-api:
     image: automacaodebaixocusto/keyguard-api:latest
     deploy:
       replicas: 1
@@ -13,26 +13,46 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.keyguard-api.rule=Host(`keyguard.iacas.top`)"
-        - "traefik.http.routers.keyguard-api.entrypoints=websecure"
-        - "traefik.http.routers.keyguard-api.tls=true"
-        - "traefik.http.routers.keyguard-api.tls.certresolver=letsencryptresolver"
-        - "traefik.http.services.keyguard-api.loadbalancer.server.port=3000"
+        - "traefik.http.routers.keyguard-frontend.rule=Host(`keyguard.iacas.top`)"
+        - "traefik.http.routers.keyguard-frontend.entrypoints=websecure"
+        - "traefik.http.routers.keyguard-frontend.tls=true"
+        - "traefik.http.routers.keyguard-frontend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.keyguard-frontend.loadbalancer.server.port=3000"
         - "traefik.docker.network=network_public"
     networks:
       - network_public
+      - keyguard-network
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:131489152850082175195580@postgres:5432/keyguard
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/keyguard
+      - PORT=3000
+      - API_HOST=keyguard.iacas.top
+      - USE_TLS=true
+      - VITE_API_HOST=keyguard.iacas.top
+      - VITE_USE_TLS=true
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=keyguard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - keyguard-network
 
 networks:
+  keyguard-network:
+    driver: bridge
   network_public:
     external: true
     name: network_public
+
+volumes:
+  postgres_data:
 
