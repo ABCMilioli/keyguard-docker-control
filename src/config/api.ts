@@ -11,4 +11,5 @@ export const API_URLS = {
   register: `${API_BASE_URL}/users/register`,
   login: `${API_BASE_URL}/users/login`,
   validateKey: `${API_BASE_URL}/validar`,
+  adminStatus: `${API_BASE_URL}/admin/status`
 }; 

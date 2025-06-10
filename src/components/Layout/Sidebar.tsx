@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -10,7 +9,8 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
-  Book
+  Book,
+  UserCog
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -27,6 +27,7 @@ const navigation = [
   { name: 'Instalações', href: '/installations', icon: Activity },
   { name: 'Documentação', href: '/documentation', icon: Book },
   { name: 'Configurações', href: '/settings', icon: Settings },
+  { name: 'Perfil', href: '/profile', icon: UserCog },
 ];
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {

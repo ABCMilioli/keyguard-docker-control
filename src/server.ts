@@ -6,6 +6,7 @@ import { APIController } from './api/controllers/apiController.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { userController } from './controllers/userController.js';
+import { checkAdminExists } from './middleware/adminCheck.js';
 
 // Carrega variáveis de ambiente
 dotenv.config();
@@ -24,9 +25,21 @@ app.use(express.json());
 // Rotas da API
 const apiRouter = express.Router();
 
+// Endpoint para verificar status do admin
+apiRouter.get('/admin/status', checkAdminExists, async (req: Request, res: Response) => {
+  res.json({ adminExists: res.locals.adminExists });
+});
+
 // Rotas públicas (sem autenticação)
-apiRouter.post('/users/register', (req: Request, res: Response) => {
-  userController.register(req, res);
+apiRouter.post('/users/register', checkAdminExists, async (req: Request, res: Response) => {
+  // Se já existe um admin, não permite registro
+  if (res.locals.adminExists) {
+    res.status(403).json({ error: 'Registro não permitido. Sistema já possui um administrador.' });
+    return;
+  }
+  // Força o primeiro usuário a ser admin
+  req.body.role = 'admin';
+  await userController.register(req, res);
 });
 
 apiRouter.post('/users/login', (req: Request, res: Response) => {

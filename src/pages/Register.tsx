@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_URLS } from '@/config/api';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,14 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { adminExists, isLoading: checkingAdmin } = useAdminStatus();
+
+  // Se já existe admin, redireciona para o login
+  React.useEffect(() => {
+    if (adminExists && !checkingAdmin) {
+      navigate('/login');
+    }
+  }, [adminExists, checkingAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +94,16 @@ export default function Register() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  if (checkingAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center p-6">
+          <CardTitle>Verificando sistema...</CardTitle>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -94,7 +113,7 @@ export default function Register() {
           </div>
           <CardTitle className="text-2xl font-bold">Criar Conta Admin</CardTitle>
           <CardDescription>
-            Crie uma nova conta administrativa
+            Configure o primeiro usuário administrador do sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -174,18 +193,20 @@ export default function Register() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Criando conta...' : 'Criar Conta'}
+              {isLoading ? 'Criando conta...' : 'Criar Conta Admin'}
             </Button>
           </form>
-          <div className="mt-4 text-center">
-            <Link
-              to="/login"
-              className="text-sm text-blue-600 hover:underline flex items-center justify-center"
-            >
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Voltar ao Login
-            </Link>
-          </div>
+          {adminExists === false && (
+            <div className="mt-4 text-center">
+              <Link
+                to="/login"
+                className="text-sm text-blue-600 hover:underline flex items-center justify-center"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Voltar ao Login
+              </Link>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

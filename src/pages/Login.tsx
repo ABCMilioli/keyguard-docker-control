@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_URLS } from '@/config/api';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { adminExists, isLoading: checkingAdmin } = useAdminStatus();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,23 +40,30 @@ export default function Login() {
         throw new Error(data.error || 'Erro ao fazer login');
       }
 
-      toast({
-        title: 'Login realizado com sucesso!',
-        description: 'Bem-vindo ao Docker API Control.',
-      });
+        toast({
+          title: 'Login realizado com sucesso!',
+          description: 'Bem-vindo ao Docker API Control.',
+        });
       
       // TODO: Salvar token e dados do usuário
-      navigate('/');
+        navigate('/');
     } catch (error) {
-      toast({
-        title: 'Erro no login',
+        toast({
+          title: 'Erro no login',
         description: error instanceof Error ? error.message : 'Email ou senha incorretos.',
-        variant: 'destructive',
-      });
+          variant: 'destructive',
+        });
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Se não existe admin, redireciona para a página de registro
+  React.useEffect(() => {
+    if (adminExists === false && !checkingAdmin) {
+      navigate('/register');
+    }
+  }, [adminExists, checkingAdmin, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
@@ -118,19 +127,6 @@ export default function Login() {
             >
               Esqueceu sua senha?
             </Link>
-            <div className="text-sm text-gray-600">
-              Não tem uma conta?{' '}
-              <Link to="/register" className="text-blue-600 hover:underline">
-                Criar conta admin
-              </Link>
-            </div>
-          </div>
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 text-center">
-              <strong>Credenciais de teste:</strong><br />
-              Email: admin@apicontrol.com<br />
-              Senha: admin123
-            </p>
           </div>
         </CardContent>
       </Card>
