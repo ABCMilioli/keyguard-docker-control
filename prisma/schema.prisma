@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id           String        @id @default(uuid())
+  nome         String
+  email        String        @unique
+  senha        String
+  chavesAPI    ChaveAPI[]
+  instalacoes  Instalacao[]
+  dataCriacao  DateTime      @default(now())
+
+  @@map("clientes")
+}
+
+model ChaveAPI {
+  id                String        @id @default(uuid())
+  chave             String        @unique
+  nome              String
+  descricao         String
+  clienteId         String
+  limiteInstalacoes Int          @default(10)
+  instalacoesAtuais Int          @default(0)
+  ativa             Boolean       @default(true)
+  ultimoHeartbeat   DateTime?
+  dataCriacao       DateTime      @default(now())
+  instalacoes       Instalacao[]
+  cliente           Cliente       @relation(fields: [clienteId], references: [id])
+
+  @@map("chaves_api")
+}
+
+model Instalacao {
+  id              String    @id @default(uuid())
+  dispositivoId   String
+  chaveApiId      String
+  clienteId       String
+  enderecoIP      String
+  infoDispositivo Json
+  ativa           Boolean   @default(true)
+  ultimoHeartbeat DateTime?
+  dataCriacao     DateTime  @default(now())
+  chaveAPI        ChaveAPI  @relation(fields: [chaveApiId], references: [id])
+  cliente         Cliente   @relation(fields: [clienteId], references: [id])
+
+  @@unique([chaveApiId, dispositivoId])
+  @@map("instalacoes")
+} 

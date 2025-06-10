@@ -1,0 +1,54 @@
+# Dependências
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDE e editores
+.idea
+.vscode
+*.swp
+*.swo
+
+# Build e cache
+dist
+.cache
+.next
+.nuxt
+.tmp
+.temp
+build
+coverage
+
+# Arquivos de desenvolvimento
+*.test.js
+*.spec.js
+__tests__
+__mocks__
+.git
+.gitignore
+.env
+.env.*
+*.md
+docker-compose*
+Dockerfile*
+.dockerignore
+.eslintrc*
+.prettierrc*
+.editorconfig
+jest.config.*
+*.log
+*.lock
+*.tsbuildinfo
+
+# Outros
+.husky
+.github
+docs
+README.md
+CHANGELOG.md
+LICENSE 

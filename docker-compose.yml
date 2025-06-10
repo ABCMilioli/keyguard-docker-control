@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    image: automacaodebaixocusto/keyguard-api:latest
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.keyguard-api.rule=Host(`keyguard.iacas.top`)"
+        - "traefik.http.routers.keyguard-api.entrypoints=websecure"
+        - "traefik.http.routers.keyguard-api.tls=true"
+        - "traefik.http.routers.keyguard-api.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.keyguard-api.loadbalancer.server.port=3000"
+        - "traefik.docker.network=network_public"
+    networks:
+      - network_public
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:131489152850082175195580@postgres:5432/keyguard
+
+  
+networks:
+  network_public:
+    external: true
+    name: network_public
+

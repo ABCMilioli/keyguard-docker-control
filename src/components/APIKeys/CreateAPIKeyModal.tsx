@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,11 +28,10 @@ export function CreateAPIKeyModal() {
     e.preventDefault();
     
     // Find or create client
-    let client = clients.find(c => c.email === formData.clientEmail);
+    const client = clients.find(c => c.email === formData.clientEmail);
     const clientId = client?.id || Math.random().toString(36).substr(2, 9);
 
     addAPIKey({
-      key: '', // This will be generated in the store
       clientId,
       clientName: formData.clientName,
       clientEmail: formData.clientEmail,
