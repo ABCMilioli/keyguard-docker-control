@@ -1,9 +1,9 @@
-
 import React from 'react';
-import { Bell, User, Search } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { UserMenu } from './UserMenu';
 
 interface HeaderProps {
   title: string;
@@ -39,12 +39,7 @@ export function Header({ title, subtitle }: HeaderProps) {
           </Button>
 
           {/* User Menu */}
-          <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-            <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <User className="h-4 w-4 text-blue-600" />
-            </div>
-            <span className="hidden md:block text-sm font-medium">Admin</span>
-          </Button>
+          <UserMenu />
         </div>
       </div>
     </header>

@@ -110,5 +110,70 @@ export const userController = {
         error: 'Erro interno do servidor' 
       });
     }
+  },
+
+  async updateProfile(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { nome, email, senhaAtual, novaSenha } = req.body;
+
+      // Busca o usuário
+      const user = await prisma.user.findUnique({
+        where: { id }
+      });
+
+      if (!user) {
+        return res.status(404).json({ 
+          error: 'Usuário não encontrado' 
+        });
+      }
+
+      // Se forneceu senha atual, verifica se está correta
+      if (senhaAtual) {
+        const passwordMatch = await bcrypt.compare(senhaAtual, user.senha);
+        if (!passwordMatch) {
+          return res.status(401).json({ 
+            error: 'Senha atual incorreta' 
+          });
+        }
+      }
+
+      // Prepara os dados para atualização
+      const updateData: any = {
+        nome,
+        email,
+        dataAtualizacao: new Date()
+      };
+
+      // Se forneceu nova senha, criptografa
+      if (novaSenha) {
+        if (novaSenha.length < 6) {
+          return res.status(400).json({ 
+            error: 'A nova senha deve ter pelo menos 6 caracteres' 
+          });
+        }
+        updateData.senha = await bcrypt.hash(novaSenha, 10);
+      }
+
+      // Atualiza o usuário
+      const updatedUser = await prisma.user.update({
+        where: { id },
+        data: updateData
+      });
+
+      // Remove a senha do objeto de retorno
+      const { senha: _, ...userWithoutPassword } = updatedUser;
+
+      return res.status(200).json({
+        message: 'Perfil atualizado com sucesso',
+        user: userWithoutPassword
+      });
+
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      return res.status(500).json({ 
+        error: 'Erro interno do servidor' 
+      });
+    }
   }
 }; 

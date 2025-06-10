@@ -46,6 +46,11 @@ apiRouter.post('/users/login', (req: Request, res: Response) => {
   userController.login(req, res);
 });
 
+// Rota de atualização de perfil
+apiRouter.put('/users/:id/profile', async (req: Request, res: Response) => {
+  await userController.updateProfile(req, res);
+});
+
 // Middleware de autenticação para todas as rotas protegidas
 apiRouter.use(validarChaveAPI);
 

@@ -8,6 +8,7 @@ import { Shield, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_URLS } from '@/config/api';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { useUser } from '@/hooks/useUser';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,6 +18,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { adminExists, isLoading: checkingAdmin } = useAdminStatus();
+  const { setUser } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,19 +42,18 @@ export default function Login() {
         throw new Error(data.error || 'Erro ao fazer login');
       }
 
-        toast({
-          title: 'Login realizado com sucesso!',
-          description: 'Bem-vindo ao Docker API Control.',
-        });
-      
-      // TODO: Salvar token e dados do usuário
-        navigate('/');
+      setUser(data.user);
+      toast({
+        title: 'Sucesso!',
+        description: 'Login realizado com sucesso.',
+      });
+      navigate('/');
     } catch (error) {
-        toast({
-          title: 'Erro no login',
-        description: error instanceof Error ? error.message : 'Email ou senha incorretos.',
-          variant: 'destructive',
-        });
+      toast({
+        title: 'Erro',
+        description: error instanceof Error ? error.message : 'Erro ao fazer login',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
