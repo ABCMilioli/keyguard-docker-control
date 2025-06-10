@@ -10,9 +10,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useUser } from '@/hooks/useUser';
 
 export function UserMenu() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { user } = useUser();
+
+  // Se não houver usuário, não renderiza o menu
+  if (!user) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -23,7 +32,7 @@ export function UserMenu() {
               <User className="h-4 w-4 text-blue-600" />
             </AvatarFallback>
           </Avatar>
-          <span className="hidden md:block text-sm font-medium">Admin</span>
+          <span className="hidden md:block text-sm font-medium">{user.nome}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -38,7 +47,10 @@ export function UserMenu() {
           <span>Configurações</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
+        <DropdownMenuItem 
+          onClick={logout} 
+          className="cursor-pointer text-red-600 focus:text-red-600"
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sair</span>
         </DropdownMenuItem>
