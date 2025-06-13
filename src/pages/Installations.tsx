@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AppLayout } from '../components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -162,7 +161,7 @@ export default function Installations() {
                       )}
                       <div className="flex items-center">
                         <Clock className="mr-1 h-4 w-4" />
-                        {installation.timestamp.toLocaleString('pt-BR')}
+                        {new Date(installation.timestamp).toLocaleString('pt-BR')}
                       </div>
                     </div>
                     

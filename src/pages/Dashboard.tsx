@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AppLayout } from '../components/Layout/AppLayout';
 import { MetricCard } from '../components/Dashboard/MetricCard';
@@ -77,7 +76,7 @@ export default function Dashboard() {
                         {installation.success ? "Sucesso" : "Falha"}
                       </Badge>
                       <p className="text-xs text-gray-500 mt-1">
-                        {installation.timestamp.toLocaleTimeString('pt-BR')}
+                        {new Date(installation.timestamp).toLocaleTimeString('pt-BR')}
                       </p>
                     </div>
                   </div>

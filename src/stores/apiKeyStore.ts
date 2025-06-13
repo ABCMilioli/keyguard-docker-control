@@ -8,6 +8,141 @@ const generateAPIKey = () => 'ak_' + Array.from({ length: 28 }, () =>
   Math.random().toString(36).charAt(0)
 ).join('');
 
+// Dados iniciais
+const initialData = {
+  apiKeys: [
+    {
+      id: '1',
+      key: 'ak_1234567890abcdef1234567890abcdef',
+      clientId: '1',
+      clientName: 'TechCorp Ltd',
+      clientEmail: 'admin@techcorp.com',
+      maxInstallations: 50,
+      currentInstallations: 23,
+      isActive: true,
+      createdAt: new Date('2024-01-15'),
+      expiresAt: new Date('2024-12-31'),
+      lastUsed: new Date('2024-06-08')
+    },
+    {
+      id: '2',
+      key: 'ak_fedcba0987654321fedcba0987654321',
+      clientId: '2',
+      clientName: 'StartupXYZ',
+      clientEmail: 'dev@startupxyz.io',
+      maxInstallations: 10,
+      currentInstallations: 8,
+      isActive: true,
+      createdAt: new Date('2024-03-20'),
+      expiresAt: new Date('2024-09-20'),
+      lastUsed: new Date('2024-06-09')
+    },
+    {
+      id: '3',
+      key: 'ak_abcdef1234567890abcdef1234567890',
+      clientId: '3',
+      clientName: 'Enterprise Solutions',
+      clientEmail: 'it@enterprise.com',
+      maxInstallations: 100,
+      currentInstallations: 67,
+      isActive: true,
+      createdAt: new Date('2024-02-10'),
+      expiresAt: null,
+      lastUsed: new Date('2024-06-09')
+    },
+    {
+      id: '4',
+      key: 'ak_567890abcdef1234567890abcdef1234',
+      clientId: '4',
+      clientName: 'DevStudio',
+      clientEmail: 'team@devstudio.dev',
+      maxInstallations: 5,
+      currentInstallations: 5,
+      isActive: false,
+      createdAt: new Date('2024-05-01'),
+      expiresAt: new Date('2024-08-01'),
+      lastUsed: new Date('2024-06-01')
+    }
+  ],
+  clients: [
+    {
+      id: '1',
+      name: 'TechCorp Ltd',
+      email: 'admin@techcorp.com',
+      company: 'TechCorp Ltd',
+      phone: '+55 11 99999-9999',
+      notes: 'Cliente premium com suporte prioritário',
+      status: 'active' as const,
+      createdAt: new Date('2024-01-15')
+    },
+    {
+      id: '2',
+      name: 'StartupXYZ',
+      email: 'dev@startupxyz.io',
+      company: 'StartupXYZ Inc',
+      phone: '+55 11 88888-8888',
+      notes: 'Startup em crescimento',
+      status: 'active' as const,
+      createdAt: new Date('2024-03-20')
+    },
+    {
+      id: '3',
+      name: 'Enterprise Solutions',
+      email: 'it@enterprise.com',
+      company: 'Enterprise Solutions Corp',
+      phone: '+55 11 77777-7777',
+      notes: 'Grande corporação, contrato anual',
+      status: 'active' as const,
+      createdAt: new Date('2024-02-10')
+    },
+    {
+      id: '4',
+      name: 'DevStudio',
+      email: 'team@devstudio.dev',
+      company: 'DevStudio',
+      phone: '+55 11 66666-6666',
+      notes: 'Atingiu limite de instalações',
+      status: 'suspended' as const,
+      createdAt: new Date('2024-05-01')
+    }
+  ],
+  installations: [
+    {
+      id: '1',
+      apiKeyId: '1',
+      apiKey: 'ak_1234567890abcdef1234567890abcdef',
+      clientName: 'TechCorp Ltd',
+      ipAddress: '192.168.1.100',
+      userAgent: 'Docker/20.10.7',
+      location: 'São Paulo, BR',
+      timestamp: new Date('2024-06-09T10:30:00'),
+      success: true
+    },
+    {
+      id: '2',
+      apiKeyId: '2',
+      apiKey: 'ak_fedcba0987654321fedcba0987654321',
+      clientName: 'StartupXYZ',
+      ipAddress: '10.0.0.50',
+      userAgent: 'Docker/24.0.2',
+      location: 'Rio de Janeiro, BR',
+      timestamp: new Date('2024-06-09T09:15:00'),
+      success: true
+    },
+    {
+      id: '3',
+      apiKeyId: '4',
+      apiKey: 'ak_567890abcdef1234567890abcdef1234',
+      clientName: 'DevStudio',
+      ipAddress: '172.16.0.10',
+      userAgent: 'Docker/23.0.1',
+      location: 'Belo Horizonte, BR',
+      timestamp: new Date('2024-06-09T08:45:00'),
+      success: false
+    }
+  ]
+};
+
 interface APIKeyStore {
   apiKeys: APIKey[];
   clients: Client[];
@@ -26,139 +161,7 @@ interface APIKeyStore {
 export const useAPIKeyStore = create<APIKeyStore>()(
   persist(
     (set, get) => ({
-      apiKeys: [
-        {
-          id: '1',
-          key: 'ak_1234567890abcdef1234567890abcdef',
-          clientId: '1',
-          clientName: 'TechCorp Ltd',
-          clientEmail: 'admin@techcorp.com',
-          maxInstallations: 50,
-          currentInstallations: 23,
-          isActive: true,
-          createdAt: new Date('2024-01-15'),
-          expiresAt: new Date('2024-12-31'),
-          lastUsed: new Date('2024-06-08')
-        },
-        {
-          id: '2',
-          key: 'ak_fedcba0987654321fedcba0987654321',
-          clientId: '2',
-          clientName: 'StartupXYZ',
-          clientEmail: 'dev@startupxyz.io',
-          maxInstallations: 10,
-          currentInstallations: 8,
-          isActive: true,
-          createdAt: new Date('2024-03-20'),
-          expiresAt: new Date('2024-09-20'),
-          lastUsed: new Date('2024-06-09')
-        },
-        {
-          id: '3',
-          key: 'ak_abcdef1234567890abcdef1234567890',
-          clientId: '3',
-          clientName: 'Enterprise Solutions',
-          clientEmail: 'it@enterprise.com',
-          maxInstallations: 100,
-          currentInstallations: 67,
-          isActive: true,
-          createdAt: new Date('2024-02-10'),
-          expiresAt: null,
-          lastUsed: new Date('2024-06-09')
-        },
-        {
-          id: '4',
-          key: 'ak_567890abcdef1234567890abcdef1234',
-          clientId: '4',
-          clientName: 'DevStudio',
-          clientEmail: 'team@devstudio.dev',
-          maxInstallations: 5,
-          currentInstallations: 5,
-          isActive: false,
-          createdAt: new Date('2024-05-01'),
-          expiresAt: new Date('2024-08-01'),
-          lastUsed: new Date('2024-06-01')
-        }
-      ],
-      
-      clients: [
-        {
-          id: '1',
-          name: 'TechCorp Ltd',
-          email: 'admin@techcorp.com',
-          company: 'TechCorp Ltd',
-          phone: '+55 11 99999-9999',
-          notes: 'Cliente premium com suporte prioritário',
-          status: 'active',
-          createdAt: new Date('2024-01-15')
-        },
-        {
-          id: '2',
-          name: 'StartupXYZ',
-          email: 'dev@startupxyz.io',
-          company: 'StartupXYZ Inc',
-          phone: '+55 11 88888-8888',
-          notes: 'Startup em crescimento',
-          status: 'active',
-          createdAt: new Date('2024-03-20')
-        },
-        {
-          id: '3',
-          name: 'Enterprise Solutions',
-          email: 'it@enterprise.com',
-          company: 'Enterprise Solutions Corp',
-          phone: '+55 11 77777-7777',
-          notes: 'Grande corporação, contrato anual',
-          status: 'active',
-          createdAt: new Date('2024-02-10')
-        },
-        {
-          id: '4',
-          name: 'DevStudio',
-          email: 'team@devstudio.dev',
-          company: 'DevStudio',
-          phone: '+55 11 66666-6666',
-          notes: 'Atingiu limite de instalações',
-          status: 'suspended',
-          createdAt: new Date('2024-05-01')
-        }
-      ],
-      
-      installations: [
-        {
-          id: '1',
-          apiKeyId: '1',
-          apiKey: 'ak_1234567890abcdef1234567890abcdef',
-          clientName: 'TechCorp Ltd',
-          ipAddress: '192.168.1.100',
-          userAgent: 'Docker/20.10.7',
-          location: 'São Paulo, BR',
-          timestamp: new Date('2024-06-09T10:30:00'),
-          success: true
-        },
-        {
-          id: '2',
-          apiKeyId: '2',
-          apiKey: 'ak_fedcba0987654321fedcba0987654321',
-          clientName: 'StartupXYZ',
-          ipAddress: '10.0.0.50',
-          userAgent: 'Docker/24.0.2',
-          location: 'Rio de Janeiro, BR',
-          timestamp: new Date('2024-06-09T09:15:00'),
-          success: true
-        },
-        {
-          id: '3',
-          apiKeyId: '4',
-          apiKey: 'ak_567890abcdef1234567890abcdef1234',
-          clientName: 'DevStudio',
-          ipAddress: '172.16.0.10',
-          userAgent: 'Docker/23.0.1',
-          location: 'Belo Horizonte, BR',
-          timestamp: new Date('2024-06-09T08:45:00'),
-          success: false
-        }
-      ],
+      ...initialData,
 
       addAPIKey: (apiKeyData) => set((state) => {
         const newAPIKey: APIKey = {
@@ -227,9 +230,10 @@ export const useAPIKeyStore = create<APIKeyStore>()(
 
         return last30Days.map(date => ({
           date,
-          installations: state.installations.filter(inst => 
-            inst.timestamp.toISOString().split('T')[0] === date && inst.success
-          ).length
+          installations: state.installations.filter(inst => {
+            const timestamp = inst.timestamp instanceof Date ? inst.timestamp : new Date(inst.timestamp);
+            return timestamp.toISOString().split('T')[0] === date && inst.success;
+          }).length
         }));
       },
 
@@ -261,7 +265,12 @@ export const useAPIKeyStore = create<APIKeyStore>()(
       }
     }),
     {
-      name: 'api-key-store'
+      name: 'api-key-store',
+      partialize: (state) => ({
+        apiKeys: state.apiKeys,
+        clients: state.clients,
+        installations: state.installations
+      })
     }
   )
 );

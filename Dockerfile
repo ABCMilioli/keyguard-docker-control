@@ -32,18 +32,17 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
-COPY start.sh ./start.sh
 
-# Torna o script executável
-RUN chmod +x /app/start.sh && \
-    # Instala o cliente Prisma em produção
-    npm install @prisma/client && \
-    # Gera o cliente Prisma
+# Instala o cliente Prisma em produção e configura o ambiente
+RUN npm install @prisma/client && \
     npx prisma generate && \
-    # Remove dev dependencies e arquivos desnecessários
     npm prune --production && \
     npm cache clean --force && \
     rm -rf /root/.npm
+
+# Ajusta as permissões dos diretórios
+RUN chown -R node:node /app && \
+    chmod -R 755 /app
 
 # Usa tini como entrypoint para melhor gerenciamento de processos
 ENTRYPOINT ["/sbin/tini", "--"]
@@ -54,5 +53,5 @@ EXPOSE 3000
 # Define usuário não-root
 USER node
 
-# Comando para iniciar a aplicação usando o script
-CMD ["/app/start.sh"] 
+# Comando para iniciar a aplicação
+CMD ["sh", "-c", "sleep 10 && npx prisma db push --accept-data-loss && npm start"] 
