@@ -6,6 +6,7 @@ WORKDIR /app
 # Copia apenas os arquivos necessários para instalar dependências
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY tsconfig*.json ./
 
 # Instala todas as dependências (incluindo as de desenvolvimento)
 RUN npm ci && \
@@ -32,6 +33,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/.env* ./
 
 # Instala o cliente Prisma em produção e configura o ambiente
 RUN npm install @prisma/client && \

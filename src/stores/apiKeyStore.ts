@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { APIKey, Client, Installation, DashboardMetrics, InstallationsByDay, ValidationResponse } from '@/types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -7,6 +7,27 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 const generateAPIKey = () => 'ak_' + Array.from({ length: 28 }, () => 
   Math.random().toString(36).charAt(0)
 ).join('');
+
+// Função para hidratar datas
+const hydrateDates = <T>(data: T): T => {
+  if (Array.isArray(data)) {
+    return data.map(item => hydrateDates(item)) as T;
+  }
+  if (data && typeof data === 'object') {
+    const hydrated = { ...data as Record<string, unknown> };
+    for (const key in hydrated) {
+      if (key === 'createdAt' || key === 'expiresAt' || key === 'lastUsed' || key === 'timestamp') {
+        if (hydrated[key]) {
+          hydrated[key] = new Date(hydrated[key] as string);
+        }
+      } else if (typeof hydrated[key] === 'object') {
+        hydrated[key] = hydrateDates(hydrated[key]);
+      }
+    }
+    return hydrated as T;
+  }
+  return data;
+};
 
 // Dados iniciais
 const initialData = {
@@ -266,11 +287,19 @@ export const useAPIKeyStore = create<APIKeyStore>()(
     }),
     {
       name: 'api-key-store',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         apiKeys: state.apiKeys,
         clients: state.clients,
         installations: state.installations
-      })
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.apiKeys = hydrateDates<APIKey[]>(state.apiKeys);
+          state.clients = hydrateDates<Client[]>(state.clients);
+          state.installations = hydrateDates<Installation[]>(state.installations);
+        }
+      }
     }
   )
 );

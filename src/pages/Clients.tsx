@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,16 +6,35 @@ import { Users, Building, Mail, Phone } from 'lucide-react';
 import { useAPIKeyStore } from '../stores/apiKeyStore';
 import { CreateClientModal } from '../components/Clients/CreateClientModal';
 import { EditClientModal } from '../components/Clients/EditClientModal';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 export default function Clients() {
   const { clients, apiKeys } = useAPIKeyStore();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      // Força uma atualização do estado para garantir que os dados estejam hidratados
+      setIsLoading(false);
+    } catch (err) {
+      setError('Erro ao carregar os dados dos clientes. Por favor, tente novamente.');
+      console.error('Erro ao carregar clientes:', err);
+    }
+  }, []);
 
   const getClientStats = (clientId: string) => {
-    const clientKeys = apiKeys.filter(key => key.clientId === clientId);
-    const activeKeys = clientKeys.filter(key => key.isActive).length;
-    const totalInstallations = clientKeys.reduce((sum, key) => sum + key.currentInstallations, 0);
-    
-    return { activeKeys, totalInstallations, totalKeys: clientKeys.length };
+    try {
+      const clientKeys = apiKeys.filter(key => key.clientId === clientId);
+      const activeKeys = clientKeys.filter(key => key.isActive).length;
+      const totalInstallations = clientKeys.reduce((sum, key) => sum + key.currentInstallations, 0);
+      
+      return { activeKeys, totalInstallations, totalKeys: clientKeys.length };
+    } catch (err) {
+      console.error('Erro ao calcular estatísticas do cliente:', err);
+      return { activeKeys: 0, totalInstallations: 0, totalKeys: 0 };
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -30,6 +49,28 @@ export default function Clients() {
         return <Badge variant="outline">Desconhecido</Badge>;
     }
   };
+
+  if (error) {
+    return (
+      <AppLayout title="Gerenciamento de Clientes">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </AppLayout>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <AppLayout title="Gerenciamento de Clientes">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout 
