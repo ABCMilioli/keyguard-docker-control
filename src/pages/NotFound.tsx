@@ -1,27 +1,34 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
 
-const NotFound = () => {
-  const location = useLocation();
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Home, AlertTriangle } from 'lucide-react';
 
-  useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
-
+export default function NotFound() {
+  console.log('NotFound page renderizando...');
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md text-center">
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-center mb-4">
+            <AlertTriangle className="h-12 w-12 text-yellow-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Página não encontrada</CardTitle>
+          <CardDescription>
+            A página que você está procurando não existe.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link to="/">
+            <Button className="w-full">
+              <Home className="h-4 w-4 mr-2" />
+              Voltar ao Dashboard
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default NotFound;
+}
